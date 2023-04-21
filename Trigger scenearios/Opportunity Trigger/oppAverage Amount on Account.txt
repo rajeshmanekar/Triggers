@@ -1,0 +1,85 @@
+Helper//
+trigger OpportunityHelper on Opportunity (after insert, after update, after delete, after undelete)
+{
+    //Average Amount on Account
+    if(trigger.isafter)
+    {
+        system.debug('trigger is called');
+        if(trigger.isinsert || trigger.isundelete)
+        {
+            system.debug('trigger.new is called');
+            AvgOppAmountAccountHandler.InsertUndeleteDeleteMethod(trigger.new);  
+        }
+        if(trigger.isdelete)
+        {
+            system.debug('trigger.old is called');
+            AvgOppAmountAccountHandler.InsertUndeleteDeleteMethod(trigger.old);
+        }
+        if(trigger.isupdate)
+        {
+            system.debug('trigger.new and trigger.old are called');
+            AvgOppAmountAccountHandler.UpdateMethod(trigger.new, trigger.oldMap);  
+        }
+    }
+}
+
+Handler//
+public class AvgOppAmountAccountHandler
+{
+    public static void InsertUndeleteDeleteMethod(List<Opportunity> newoppList)
+    {
+        system.debug('newoppList' + newoppList);
+        set<Id> setId = new set<Id>();
+        for(Opportunity opp : newoppList)
+        {
+            setId.add(opp.AccountId);
+        } 
+        
+        List<Account> accList = [SELECT Id, Average_Amount__c,(SELECT Id FROM Opportunities) FROM Account WHERE Id IN: setId];
+        system.debug('accList' + accList);
+        for(Account acc : accList)
+        {            
+            for(Opportunity opp : newoppList)
+            {
+                acc.Average_Amount__c = opp.Amount/acc.Opportunities.size();
+            }
+        }
+        if(accList.size()>0)
+        {
+            update accList;
+        }     
+    }
+    
+    
+    public static void UpdateMethod(List<Opportunity> newoppList, Map<Id, Opportunity> oldMap)
+    {
+        system.debug('newoppList' + newoppList);
+           
+        set<Id> setId = new set<Id>();
+        for(Opportunity opp : newoppList)
+        {
+              system.debug('1st inside if');
+              setId.add(opp.AccountId);
+              setId.add(oldMap.get(opp.Id).AccountId);   
+        } 
+        
+        List<Account> accList = [SELECT Id, Average_Amount__c,(SELECT Id FROM Opportunities) FROM Account WHERE Id IN: setId];
+        system.debug('accList' + accList);
+        for(Account acc : accList)
+        {            
+            for(Opportunity opp : newoppList)
+            {
+                if((opp.Amount != oldMap.get(opp.Id).Amount) || (opp.AccountId != oldMap.get(opp.Id).AccountId))
+                {
+                 system.debug('inside for');
+                  acc.Average_Amount__c = opp.Amount/acc.Opportunities.size();          
+                }  
+            }
+        }
+        system.debug('accList.size()' + accList.size());
+        if(accList.size()>0)
+        {
+            update accList;
+        }
+    }
+}

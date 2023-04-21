@@ -1,0 +1,27 @@
+Helper//
+trigger OpportunityHelper on Opportunity (before insert, before update)
+{   
+	//closed date should not be previous than today
+    if(trigger.isbefore)
+    {
+        if(trigger.isinsert || trigger.isupdate)
+        {
+         ClosedDateIsOnlyTodayHandler.MainMethod(trigger.new);   
+        }
+    }
+}
+
+Handler//
+public class ClosedDateIsOnlyTodayHandler
+{
+    public static void MainMethod(List<Opportunity> newoppList)
+    {
+        for(Opportunity opp : newoppList)
+        {
+            if(opp.CloseDate < system.today())
+            {
+                opp.addError('You can not choose closed date previous than today');
+            }
+        }
+    }
+}

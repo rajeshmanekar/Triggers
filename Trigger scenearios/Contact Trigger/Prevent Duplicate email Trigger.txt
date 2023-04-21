@@ -1,0 +1,72 @@
+Prevent Duplicate Email Trigger
+
+Helper
+trigger ContactTrgHelper on Contact (before insert, before update)
+{
+    if(trigger.isbefore)
+    {
+        if(trigger.isinsert)
+        {
+            PreventDupEmailConHandlerClass.InsertMethod(trigger.new);
+        }
+        if(trigger.isupdate)
+        {
+            PreventDupEmailConHandlerClass.UpdateMethod(trigger.new, trigger.oldMap);
+        }
+    }
+}
+
+Handler
+/*
+*Name 		          : Rajesh Santosh Manekar
+*CreatedDate          : 10th Aug 2022
+*Version              : v0.1
+*Description      	  : This class prevent duplicate email in contact while insert and update operation.
+*LastModifiedDate     : -
+*/
+public class PreventDupEmailConHandlerClass
+{
+    public static void InsertMethod(List<Contact> newconList)
+    {
+        set<String> Emailset = new set<String>();
+        for(Contact con : newconList)
+        {
+            Emailset.add(con.Email);
+        }
+        List<Contact> conList = [SELECT Id, Email FROM Contact WHERE Email IN: Emailset];
+        set<String> ExistingEmailset = new set<String>();
+        for(Contact con1 : conList)
+        {
+            ExistingEmailset.add(con1.Email);
+        }
+        for(Contact con2 : newconList)
+        {
+            if(ExistingEmailset.contains(con2.Email))
+            {
+                con2.Email.addError('Email already Exists.');
+            }  
+        }
+    }
+    public static void UpdateMethod(List<Contact> newconList, Map<Id, Contact> oldMap)
+    {
+        set<String> Emailset = new set<String>();
+        set<String> ExistingEmailset = new set<String>();
+        for(Contact con : newconList)
+        {
+            Emailset.add(con.Email);
+            Emailset.add(oldMap.get(con.Id).Email);
+        }
+        List<Contact> conList = [SELECT Id, Email FROM Contact WHERE Email IN: Emailset];
+        for(Contact con1 : conList)
+        {
+            ExistingEmailset.add(con1.Email);
+        }
+        for(Contact con2 : newconList)
+        {
+            if(ExistingEmailset.contains(con2.Email) && con2.Email != oldMap.get(con2.Id).Email)
+            {
+                con2.Email.addError('Email already Exists.');
+            }  
+        }
+    }
+}

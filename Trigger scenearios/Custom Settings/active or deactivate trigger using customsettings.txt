@@ -1,0 +1,37 @@
+trigger AccountTrgHelper on Account (before insert, after insert, before update, after update, before delete, after delete, after undelete)
+{  
+    /*List custom settings
+    Boolean b = Trigger_Control_List_Type__c.getInstance('Account').isActive__c;
+    if(trigger.isbefore && trigger.isinsert)
+    {
+        if(b==true)
+        {
+         PhonenotnullinAccHandler.MainMethod(trigger.new);   
+        }
+    }*/
+    
+    //Hierarchy custom settings
+    Boolean b = Trigger_Control_Hierarchy_Type__c.getInstance('00e5i000002fmjG').isActive__c;
+    if(trigger.isbefore && trigger.isinsert)
+    {
+        if(b==true)
+        {
+         PhonenotnullinAccHandler.MainMethod(trigger.new);   
+        }
+    }    
+}
+
+Handler//
+public class PhonenotnullinAccHandler 
+{
+    public static void MainMethod(List<Account> accList)
+    {
+        for(Account acc : accList)
+        {
+            if(acc.Phone == null)
+            {
+                acc.addError('please enter a valid ph number');
+            }
+        }
+    }
+}

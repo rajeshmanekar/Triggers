@@ -1,0 +1,40 @@
+public class CustomSettingClass
+{
+    public static void ListCustomSettingMethod()
+    {
+         //List custom setttings methods : getAll(), getInstance(), getValues()
+        Map<String, CountryCodeCustomSettings__c> csList = CountryCodeCustomSettings__c.getAll();
+        system.debug('csList' + csList);
+
+        CountryCodeCustomSettings__c cs = CountryCodeCustomSettings__c.getInstance('India');
+        system.debug('cs' + cs);
+        
+        String csCode = CountryCodeCustomSettings__c.getInstance('India').Country_Code__c;
+        system.debug('csCode' + csCode);
+        
+		CountryCodeCustomSettings__c getValues = CountryCodeCustomSettings__c.getValues('India');
+        system.debug('getValues' + getValues);        
+    }
+    
+    public static void HierarchyCustomSettingMethod()
+    {
+         //Hierarchy custom Methods : getOrgDefaults(), getValues(), getInstance()
+	    Pricing_Hierarchy_Custom_Settings__c getInstance = Pricing_Hierarchy_Custom_Settings__c.getInstance();//250(current User)
+        system.debug('getInstance'+getInstance);
+         
+        Pricing_Hierarchy_Custom_Settings__c getInstance1 = Pricing_Hierarchy_Custom_Settings__c.getInstance('00e5i000002fmjG');//500(profile)//if we dont have user then we get an org level
+        system.debug('getInstance1'+getInstance1);
+         
+        Pricing_Hierarchy_Custom_Settings__c getInstance2 = Pricing_Hierarchy_Custom_Settings__c.getInstance('0055i000004C1Z3');//250(User)//if we dont have user then we get an org level
+        system.debug('getInstance2'+getInstance2);
+         
+        Pricing_Hierarchy_Custom_Settings__c getValProfile = Pricing_Hierarchy_Custom_Settings__c.getValues('00e5i000002fmjG');//500// if we dont have user then it will give null
+        system.debug('getValProfile' + getValProfile);
+         
+        Pricing_Hierarchy_Custom_Settings__c getValUser = Pricing_Hierarchy_Custom_Settings__c.getValues('0055i000004C1Z3');//250// if we dont have user then it will give null
+        system.debug('getValUser' + getValUser);
+         
+        Pricing_Hierarchy_Custom_Settings__c getOrgDefaults = Pricing_Hierarchy_Custom_Settings__c.getOrgDefaults();//1000(Default Organization Level Value)
+        system.debug('getOrgDefaults' + getOrgDefaults);
+    }
+}

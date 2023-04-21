@@ -1,0 +1,57 @@
+Helper//
+trigger ProjectHelper on Project__c (after insert, after update)
+{
+    if(trigger.isafter && trigger.isinsert)
+    {
+       ProjStagChangeCreateProjectHisHandler.ProjStagChangeCreateProjectHisHandlerMethod(trigger.new);
+    }
+    
+     if(trigger.isafter && trigger.isupdate)
+    {
+       ProjStagChangeCreateProjectHisHandler.ProjStagChangeCreateProjectHisHandlerMethod1(trigger.new, trigger.oldMap);
+    }
+}
+
+Handler//
+public class ProjStagChangeCreateProjectHisHandler
+{
+    public static void ProjStagChangeCreateProjectHisHandlerMethod(List<Project__c> newproList)
+    {
+   		List<Project_History__c> proList = new List<Project_History__c>();
+        for(Project__c pro : newproList)
+        {
+                Project_History__c proHis = new Project_History__c();
+                proHis.Project__c = pro.Id;// Project__c is the lookup field in project history
+                proHis.Stage_Changed_to__c = pro.Stage__c;
+                proHis.Stage_Changed_By__c = userInfo.getName();
+                proHis.Stage_Changed_DateTime__c = system.now();
+                proList.add(proHis);
+        }
+        if(proList.size()>0)
+        {
+            insert proList;
+        }
+    }
+    
+    public static void ProjStagChangeCreateProjectHisHandlerMethod1(List<Project__c> newproList, Map<Id, Project__c> oldMap)
+    {    
+   		List<Project_History__c> proList = new List<Project_History__c>();// stage changed from new to in progress
+        for(Project__c pro : newproList)
+        {
+            if(pro.Stage__c != oldMap.get(pro.Id).Stage__c)
+            {
+                Project_History__c proHis = new Project_History__c();
+                proHis.Project__c = pro.Id;
+                proHis.Stage_Changed_From__c = oldMap.get(pro.Id).Stage__c;
+                proHis.Stage_Changed_to__c = pro.Stage__c;
+                proHis.Stage_Changed_By__c = userInfo.getName();
+                proHis.Stage_Changed_DateTime__c = pro.LastModifiedDate;
+                proList.add(proHis);
+            }
+        }
+        if(proList.size()>0)
+        {
+            insert proList;
+        }
+    }
+}

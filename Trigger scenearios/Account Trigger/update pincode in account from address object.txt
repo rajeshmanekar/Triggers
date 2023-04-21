@@ -1,0 +1,66 @@
+//Heplper
+trigger AccountTrgHelper on Account (before insert, before update)
+{
+    if(trigger.isbefore)
+    {
+        system.debug('trigger is called ');
+        if(trigger.isinsert)
+        {
+            system.debug('trigger.new insert is called');
+             UpdatePincodeInAccHandler.InsertMethod(trigger.new);
+        }
+        if(trigger.isupdate)
+        {
+            system.debug('trigger.new update is called');
+            UpdatePincodeInAccHandler.UpdateMethod(trigger.new, trigger.oldMap);
+        }
+		
+//Handler
+public class UpdatePincodeInAccHandler
+{
+    public static void InsertMethod(List<Account> newaccList)
+    {
+        system.debug('newaccList' + newaccList);
+        
+        List<Address__c> addList = [SELECT Id, State__c, City__c, PinCode__c FROM Address__c];
+        system.debug('addList' + addList);
+        Map<string, Integer> newMap = new Map<string, Integer>(); 
+        for(Address__c add : addList)
+        {  
+            newMap.put(add.State__c + ' ' + add.City__c , (Integer)add.PinCode__c);
+        }
+                 
+        for(Account acc : newaccList)
+        {
+            string s = acc.BillingState + ' ' +acc.BillingCity;
+            if(newMap.containsKey(s))
+            {
+                system.debug('inside if');
+                acc.Address_Pin_Code__c = newMap.get(s);     
+            }
+        } 
+    }
+    
+    public static void UpdateMethod(List<Account> newaccList, Map<Id, Account> oldMap)
+    {
+        system.debug('newaccList' + newaccList);
+        
+        List<Address__c> addList = [SELECT Id, State__c, City__c, PinCode__c FROM Address__c];
+        system.debug('addList' + addList);
+        Map<string, Integer> newMap = new Map<string, Integer>(); 
+        for(Address__c add : addList)
+        {  
+            newMap.put(add.State__c + ' ' + add.City__c , (Integer)add.PinCode__c);
+        }
+                 
+        for(Account acc : newaccList)
+        {
+            string s = acc.BillingState + ' ' +acc.BillingCity;
+            if(newMap.containsKey(s) && (acc.BillingState != oldMap.get(acc.Id).BillingState || acc.BillingCity != oldMap.get(acc.Id).BillingCity))
+            {
+                system.debug('inside if');
+                acc.Address_Pin_Code__c = newMap.get(s);     
+            }
+        } 
+    }
+}

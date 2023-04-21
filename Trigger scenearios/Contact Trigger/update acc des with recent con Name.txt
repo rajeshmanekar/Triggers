@@ -1,0 +1,40 @@
+Helper//
+trigger ContactTrgHelper on Contact (after insert) 
+{
+    if(trigger.isafter)
+    {
+        if(trigger.isinsert)
+        {
+            UpdateAccDesRecentConNameHandler.UpdateAccDesRecentConNameHandlerMethod(trigger.new);
+        }
+	}
+}
+
+Handler//
+public class UpdateAccDesRecentConNameHandler 
+{
+    public static void UpdateAccDesRecentConNameHandlerMethod(List<Contact> conList)
+    {
+        conList = [SELECT Id, Name, Account.Description, AccountId FROM Contact
+                   WHERE AccountId !=null ORDER BY CreatedDate ASC];
+        Map<Id, String> newMap = new Map<Id, String>();
+        
+        for(Contact con : conList)
+        {
+            newMap.put(con.AccountId, con.Name);
+        }
+        
+        List<Account> accList = [SELECT Id, Name, Description FROM Account WHERE Id IN: newMap.keyset()];
+        for(Account ac : accList)
+        {
+            if(newMap.containskey(ac.Id))
+            {
+                ac.Description = newMap.get(ac.Id);
+            }
+        }
+        if(accList.size()>0)
+        {
+          update accList;    
+        }
+    }
+}

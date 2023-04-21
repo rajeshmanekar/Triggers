@@ -1,0 +1,65 @@
+Helper//
+trigger ContactTrgHelper on Contact (after insert, after update) 
+{
+    if(trigger.isafter)
+    {
+        if(trigger.isinsert)
+        {
+            UpdateAccPhConRecPhHandler.UpdateAccPhConRecPhHandlerMethod(trigger.new);
+        }
+		if(trigger.isupdate)
+        {
+            UpdateAccPhConRecPhHandler.UpdateAccPhConRecPhHandlerMethod1(trigger.new, trigger.oldmap);
+        }
+	}
+}
+
+Handler//
+public class UpdateAccPhConRecPhHandler 
+{ 
+    public static void UpdateAccPhConRecPhHandlerMethod(List<Contact> conList)
+    {
+        List<Account> AccUpdate = new List<Account>();
+        Account acc;
+        for(Contact con : conList)
+        {
+            if(con.Phone != null)
+            {
+                acc = new Account();
+                acc.Id = con.AccountId;
+                acc.Phone = con.Phone;
+                AccUpdate.add(acc);     
+            }
+         }
+        if(AccUpdate.size()>0)
+        {
+            update Accupdate;
+        }
+    }
+    
+    public static void UpdateAccPhConRecPhHandlerMethod1(List<Contact> conList, Map<Id, Contact> oldMap)
+    {
+        Map<Id, String> newMap = new Map<Id, String>();
+        
+        for(Contact con : conList)
+        {
+            if(con.Phone != oldMap.get(con.Id).Phone)
+            {
+          		newMap.put(con.AccountId, con.Phone);      
+            }
+        }
+        
+        List<Account> accList = [SELECT Id, Name, Phone FROM Account WHERE Id IN: newMap.keyset()];
+        for(Account acc : accList)
+        {
+            if(newMap.containskey(acc.Id))
+            {
+              acc.Phone = newMap.get(acc.Id);        
+            }
+        }
+        if(accList.size() > 0)
+        {
+            update accList;
+        }
+    }
+}

@@ -1,0 +1,68 @@
+Helper//
+trigger MilestoneHelper on Milestone__c (before insert, before update)
+{
+    system.debug('trigger is called.');
+    if(trigger.isbefore)
+    {
+      if(trigger.isinsert)
+       {
+        system.debug('trigger.new is called while insert');
+        OnlyOneMilestoneonProjectHandler.InsertMethod(trigger.new);
+       }
+      if(trigger.isupdate)
+      {
+        system.debug('trigger.new and trigger.oldMap is called while update');
+        OnlyOneMilestoneonProjectHandler.UpdateMethod(trigger.new, trigger.oldMap);
+      }
+    }
+}
+
+Handler//
+public class OnlyOneMilestoneonProjectHandler
+{
+    public static void InsertMethod(List<Milestone__c> newMilList)
+    {
+        system.debug('newMilList' + newMilList);
+        set<Id> projectIds = new set<Id>();
+        for(Milestone__c mil : newMilList)
+        {
+            projectIds.add(mil.Project__c);
+        }
+        
+        List<Milestone__c> milList = [SELECT Id, Name FROM Milestone__c WHERE Project__c IN: projectIds];
+        system.debug('milList' + milList);
+        for(Milestone__c mile : newMilList)
+        {
+            if(milList.size()>=1)
+            {
+                system.debug('inside if ');
+                mile.addError('More than one Milestone is not allowed.');
+            }
+        }
+    }
+    
+    public static void UpdateMethod(List<Milestone__c> newMilList, Map<Id, Milestone__c> oldMap)
+    {
+        system.debug('newMilList' + newMilList);
+        set<Id> projectIds = new set<Id>();
+        for(Milestone__c mil : newMilList)
+        {
+            projectIds.add(mil.Project__c);
+        }
+        
+        List<Milestone__c> milList = [SELECT Id, Name FROM Milestone__c WHERE Project__c IN: projectIds];
+        system.debug('milList' + milList);
+        for(Milestone__c mile : newMilList)
+        {
+            if(mile.Project__c != oldMap.get(mile.Id).Project__c)
+            {
+                system.debug('1st inside if');
+            	if(milList.size()>=1)
+                {
+                system.debug('2nd inside if');
+                mile.addError('More than one Milestone is not allowed.');
+                }    
+            }
+        }
+    }
+}

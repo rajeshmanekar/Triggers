@@ -1,0 +1,39 @@
+Helper//
+trigger ContactTrgHelper on Contact (after insert) 
+{
+if(trigger.isafter)
+    {
+        if(trigger.isinsert)
+        {
+             AddContactNameAccDescriptionHandler.AddContactNameAccDescriptionHandlerMethod(trigger.new);
+        }
+	}
+}
+
+Handler//
+public class AddContactNameAccDescriptionHandler
+{
+    public static void AddContactNameAccDescriptionHandlerMethod(List<Contact> newconList)
+    {
+        
+        Map<Id, String> newMap = new Map<Id, String>();
+        for(Contact con : newconList)
+        {
+           newMap.put(con.AccountId, con.Name);
+        }
+     
+        List<Account> acc = [SELECT Id, Name, Contact_Name_Description__c FROM Account WHERE Id IN: newMap.keyset()];
+        system.debug(acc);
+        for(Account ac : acc)
+         {
+            if(newMap.containskey(ac.Id))
+            {
+                ac.Contact_Name_Description__c = newMap.get(ac.Id);
+            }   
+         }
+            if(acc.size() > 0)
+            {
+                update acc;
+            }
+    }
+}

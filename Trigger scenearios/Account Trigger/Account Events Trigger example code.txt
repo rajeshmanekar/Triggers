@@ -1,0 +1,163 @@
+trigger AccountEventsTrg on Account (before insert, after insert, before update, after update, before delete, after delete, after undelete) 
+{
+    /*if(trigger.isinsert)
+    {
+        for(Account acc : trigger.new)
+        {
+            system.debug(acc);
+            /*before insert DEBUG => Account:{Id=null, IsDeleted=false, MasterRecordId=null, Name=AccountTrg, Type=null, ParentId=null, BillingStreet=null,
+                                     BillingCity=null,BillingState=null, BillingPostalCode=null, BillingCountry=null, BillingLatitude=null, BillingLongitude=null,
+                                     BillingGeocodeAccuracy=sysull, ShippingStreet=null, ShippingCity=null, ShippingState=null, ShippingPostalCode=null,
+                                     ShippingCountry=null, ShippingLatitude=null, ShippingLongitude=null, ShippingGeocodeAccuracy=null, Phone=null, Fax=null,
+                                     AccountNumber=null, W
+              after insert DEBUG => Account:{Id=0015i00000LJ3hCAAT, IsDeleted=false, MasterRecordId=null, Name=AccountTrg, Type=null, ParentId=null,
+                                    BillingStreet=null, BillingCity=null, BillingState=null, BillingPostalCode=null, BillingCountry=null, BillingLatitude=null,
+                                    BillingLongitude=null, BillingGeocodeAccuracy=null, ShippingStreet=null, ShippingCity=null, ShippingState=null, 
+                                    ShippingPostalCode=null, ShippingCountry=null, ShippingLatitude=null, ShippingLongitude=null, ShippingGeocodeAccuracy=null,
+                                    Phone=null, Fax=null, Account*/
+           //system.debug('trigger.new =>' + trigger.newMap.get(acc.Id));
+            /*system.debug('trigger.old =>' + trigger.old);//null
+           
+         }
+    }*/
+    
+   /* if(trigger.isupdate)
+    {
+        //updated the acc Name from AccountTrg to AccountTriggerupdate
+        for(Account acc : trigger.new)
+        {
+            system.debug(acc.Name);
+            /*before update name DEBUG => AccountTriggerupdate  
+              after update name DEBUG => AccountTriggerupdate*/
+           /* system.debug('new => ' + trigger.new);//AccountTriggerupdate
+            system.debug('newMap => ' + trigger.newMap.get(acc.Id));//yes it gives newmap
+            system.debug('old => ' + trigger.old);//AccountTrg
+            system.debug('oldMap => ' + trigger.oldMap.get(acc.Id));//yes it gives oldmap
+        }
+    }
+    
+    if(trigger.isdelete)
+    {
+        //deleted the acc which name was TriggerTrg2
+        for(Account acc : trigger.old)
+        {
+            system.debug('old => ' + trigger.old);//TriggerTrg2
+            system.debug('oldMap => ' + trigger.oldMap.get(acc.Id));//yes it gives oldmap
+        }
+    }
+    /*after using trigger.new it didnt allow to delete the records it will shown an msg like 
+There's a problem saving this record. You might not have permission to edit it, or it might have been deleted or archived.
+Contact your administrator for help.*/
+    
+   /*if(trigger.isbefore && trigger.isinsert)
+    {
+        for(Account acc : trigger.new)
+        {
+            system.debug('trigger.new' + trigger.new);//it will give Id as null because it is before insert
+        }
+    }*/
+    
+  /*if(trigger.isbefore && trigger.isupdate)
+    {
+        //update the acc name from AccountTrg3 to AccountTrg4
+        for(Account acc : trigger.new)
+        {
+            system.debug('trigger.new' + trigger.new);//AccountTrg4
+            system.debug('trigger.newMap' + trigger.newMap.get(acc.Id));
+            system.debug('trigger.old' + trigger.old);//AccountTrg3
+            system.debug('trigger.oldMap' + trigger.oldMap.get(acc.Id));
+        }
+    }*/
+    
+   /*if(trigger.isbefore && trigger.isdelete)
+    {
+        //deleting the acc which name was AccountTrg4
+        for(Account acc : trigger.old)
+        {
+            system.debug('trigger.old' + trigger.old);//AccountTrg4
+            system.debug('trigger.oldMap' + trigger.oldMap.get(acc.Id));
+        }
+    }*/
+    
+   /*if(trigger.isafter && trigger.isinsert)
+    {
+        for(Account acc : trigger.new)
+        {
+            system.debug('trigger.new' + trigger.new);//it will give Id because it is before insert
+            system.debug('trigger.newMap' + trigger.newMap.get(acc.Id));
+        }
+    }*/
+    
+    /*if(trigger.isafter && trigger.isupdate)
+    {
+        //update the acc name from AccountTrg5 to AccountTrg6
+        for(Account acc : trigger.new)
+        {
+            system.debug('trigger.new' + trigger.new);//AccountTrg6
+            system.debug('trigger.newMap' + trigger.newMap.get(acc.Id));
+            system.debug('trigger.old' + trigger.old);//AccountTrg5
+            system.debug('trigger.oldMap' + trigger.oldMap.get(acc.Id));
+        }
+    }*/
+    
+   /*if(trigger.isafter && trigger.isdelete)
+    {
+        //deleting the acc which name was AccountTrg6
+        for(Account acc : trigger.old)
+        {
+            system.debug('trigger.old' + trigger.old);//AccountTrg6
+            system.debug('trigger.oldMap' + trigger.oldMap.get(acc.Id));
+        }
+    }*/
+    
+   /*if(trigger.isafter && trigger.isundelete)
+    {
+        //undeleting the acc record whose name is TriggerTrg2
+        for(Account acc : trigger.new)
+        {
+            system.debug('trigger.new' + trigger.new);//TriggerTrg2
+            system.debug('trigger.newMap' + trigger.newMap.get(acc.Id));
+        }
+    }*/
+    /*if i give trigger.old in undelete then it will show an error like
+AccountEventsTrg: execution of AfterUndelete caused by: System.NullPointerException: Attempt to de-reference a null object
+Trigger.AccountEventsTrg: line 114, column 1*/
+    
+    /*if(trigger.isbefore)
+    {
+        if(trigger.isinsert || trigger.isupdate)
+        {
+            for(Account acc : trigger.new)
+            {
+                system.debug('trigger.new' + trigger.new);//it will run only when it is beforeinsert(Id is null) or beforeupdate is performing
+            }
+        }
+    }*/
+    
+    /*if(trigger.isafter)
+    {
+        if(trigger.isinsert || trigger.isupdate)
+        {
+            for(Account acc : trigger.new)
+            {
+                system.debug('trigger.new' + trigger.new);//it will run only when it is afterinsert(Id is present) or afterupdate is performing
+            }
+        }
+    }*/
+    
+    /*if((trigger.isbefore && trigger.isinsert || trigger.isafter && trigger.isupdate))
+    {
+        for(Account acc : trigger.new)
+        {
+            system.debug('trigger.new' + trigger.new);// it will run only when it is beforeinsert or afterupdate is performing
+        }
+    }*/
+    
+    /*if((trigger.isafter && trigger.isinsert || trigger.isbefore && trigger.isupdate))
+    {
+        for(Account acc : trigger.new)
+        {
+            system.debug('trigger.new' + trigger.new);// it will run only when it is afterinsert or beforeupdate is performing
+        }
+    }*/
+}

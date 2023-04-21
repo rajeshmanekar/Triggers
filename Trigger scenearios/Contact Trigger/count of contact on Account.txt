@@ -1,0 +1,78 @@
+Helper//
+trigger ContactTrgHelper on Contact (before insert, after insert, before update, after update, before delete, after delete, after undelete) 
+{
+ //CountOfContact
+    if(trigger.isafter)
+    {
+        system.debug('trigger is called');
+        if(trigger.isinsert || trigger.isundelete)
+        {
+            system.debug('trigger is called for trigger.new');
+            CountOfContactsOnAccHandler.InsertAndUndeleteDeleteMethod(trigger.new);
+        }
+        if(trigger.isdelete)
+        {
+            system.debug('trigger is called for trigger.old');
+            CountOfContactsOnAccHandler.InsertAndUndeleteDeleteMethod(trigger.old);
+        }
+        if(trigger.isupdate)
+        {
+            system.debug('trigger is called for trigger.new and trigger.oldMap');
+            CountOfContactsOnAccHandler.UpdateMethod(trigger.new, trigger.oldMap);
+        }
+    }
+	
+Handler//
+public class CountOfContactsOnAccHandler
+{
+    public static void InsertAndUndeleteDeleteMethod(List<Contact> newconList)
+    {
+        system.debug('newconList' + newconList);
+        set<Id> setId = new set<Id>();
+        for(Contact con : newconList)
+        {
+         if(con.AccountId != null)
+            {
+   		      setId.add(con.AccountId);                
+            }
+        } 
+         MainMethod(setId);
+    }
+    
+   
+        
+   public static void UpdateMethod(List<Contact> newconList, Map<Id, Contact> oldMap)
+    {
+        system.debug('newconList' + newconList);
+        system.debug('oldMap' + oldMap);
+        set<Id> setId = new set<Id>();
+        for(Contact con : newconList)
+        {
+            if(con.AccountId != null && con.AccountId != oldMap.get(con.Id).AccountId)
+            {
+            	setId.add(con.AccountId);
+                setId.add(oldMap.get(con.Id).AccountId);    
+            }   
+        } 
+          MainMethod(setId);
+   }
+    
+    public static void MainMethod(set<Id> setId)
+    {
+        List<Account> accList = new List<Account>();
+        List<Account> accquery = [SELECT Id, Count_of_Contact__c,(SELECT Id FROM Contacts) FROM Account WHERE Id IN: setId];
+        system.debug('accquery' + accquery);
+        for(Account acc : accquery)
+        {
+            system.debug('acc.Contacts.size()' + acc.Contacts.size());
+            Integer count = acc.Contacts.size();
+            acc.Count_of_Contact__c = count;
+            accList.add(acc);
+        }
+        system.debug('accList.size()' + accList.size());
+        if(accList.size()>0)
+        {
+            update accList;
+        }
+    }
+}

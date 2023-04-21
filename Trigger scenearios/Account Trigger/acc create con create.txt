@@ -1,0 +1,30 @@
+//Helper
+trigger AccountTrgHelper on Account (after insert)
+{
+    if(trigger.isafter)
+    {
+        if(trigger.isinsert)
+        {
+            AccountTrgHandler.AccountTrgHandlerMethod(trigger.new);
+        }
+}
+
+Helper//
+public class AccountTrgHandler
+{
+    public static void AccountTrgHandlerMethod(List<Account> newaccList)
+    {
+        List<Contact> conList = new List<Contact>();
+        for(Account acc : newaccList)
+        {
+            Contact con = new Contact();
+            con.AccountId = acc.Id;
+            con.LastName = acc.Name;
+            conList.add(con);
+        }
+        if(conList.size()>0)
+        {
+         insert conList;    
+        }
+    }
+}

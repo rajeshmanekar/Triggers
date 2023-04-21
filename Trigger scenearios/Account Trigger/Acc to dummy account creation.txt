@@ -1,0 +1,33 @@
+//Helper
+trigger AccountTrgHelper on Account (after insert)
+{
+    if(trigger.isafter)
+    {
+        if(trigger.isinsert)
+        {
+            DummyAccountTrgHandler.DummyAccountTrgHandlerMethod(trigger.new);     
+        }
+}
+
+//Handler
+public class DummyAccountTrgHandler 
+{
+    public static void DummyAccountTrgHandlerMethod(List<Account> newaccList)
+    {
+        List<Dummy_Account__c> dummyAccList = new List<Dummy_Account__c>();
+        for(Account acc : newaccList)
+        {
+            Dummy_Account__c dummyAcc = new Dummy_Account__c();
+            dummyAcc.Name = acc.Name;
+            dummyAcc.Dummy_Rating__c = acc.Rating;
+            dummyAcc.Dummy_Phone__c = acc.Phone;
+            dummyAcc.Dummy_Annnual_Revenue__c = acc.AnnualRevenue;
+            dummyAcc.Dummy_Description__c = acc.Description;
+            dummyAccList.add(dummyAcc);
+        }
+        if(dummyAccList.size()>0)
+        {
+           insert dummyAccList;     
+        }
+    }
+}

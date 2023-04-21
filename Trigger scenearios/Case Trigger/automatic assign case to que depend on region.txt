@@ -1,0 +1,44 @@
+Helper//
+trigger CaseTrgHelper on Case (before insert)
+{   
+    if(trigger.isbefore && trigger.isinsert)
+    {
+        AutoMaticAssingCaseTogroupHandler.InsertMetod(trigger.new);
+    }
+}
+
+Handler//
+public class AutoMaticAssingCaseTogroupHandler
+{
+    public static void InsertMetod(List<Case> newcasList)
+    {
+      Id NorthregionId = [SELECT Id FROM Group WHERE name =: 'North Region'].Id; 
+      Id SouthregionId = [SELECT Id FROM Group WHERE name =: 'South Region'].Id; 
+      Id EastregionId = [SELECT Id FROM Group WHERE name =: 'East Region'].Id; 
+      Id WestregionId = [SELECT Id FROM Group WHERE name =: 'West Region'].Id; 
+        
+        for(Case cas : newcasList)
+        {
+            if(cas.Region__c == 'North')
+            {
+                cas.OwnerId = NorthregionId;
+            }
+            else if(cas.Region__c == 'South')
+            {
+                cas.OwnerId = SouthregionId;
+            }
+            else if(cas.Region__c == 'East')
+            {
+                cas.OwnerId = EastregionId;
+            }
+            else if(cas.Region__c == 'West')
+            {
+                cas.OwnerId = WestregionId;
+            }
+            else
+            {
+                cas.OwnerId = UserInfo.getUserId();
+            }
+        }
+    }
+}

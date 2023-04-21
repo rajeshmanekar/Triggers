@@ -1,0 +1,95 @@
+Helper//
+trigger ContactTrgHelper on Contact (before insert, after insert, before update, after update, before delete, after delete, after undelete) 
+{
+//Annual avg revenue in contact
+    if(trigger.isafter)
+    {
+        system.debug('trigger is called');
+        if(trigger.isinsert || trigger.isundelete)
+        {
+            system.debug('trigger is called for trigger.new');
+            AvgAnnualRevenueonContactHandler.InsertUndeleteDeleteMethod(trigger.new);
+        }
+        if(trigger.isdelete)
+        {
+            system.debug('trigger is called for trigger.old');
+            AvgAnnualRevenueonContactHandler.InsertUndeleteDeleteMethod(trigger.old);
+        }
+        if(trigger.isupdate)
+        {
+            system.debug('trigger is called for trigger.new and trigger.oldMap');
+            AvgAnnualRevenueonContactHandler.UpdateMethod(trigger.new, trigger.oldMap);
+        }
+    }
+}
+
+Handler//
+public class AvgAnnualRevenueonContactHandler
+{
+    public static void InsertUndeleteDeleteMethod(List<Contact> conList)
+    {
+        set<Id> setId = new set<Id>();
+        system.debug('conList' + conList);
+        for(Contact con : conList)
+        {
+          setId.add(con.AccountId);
+        }
+        
+        Map<Id, Decimal> newMap = new Map<Id, Decimal>();
+        List<Account> accList = [SELECT Id, AnnualRevenue,(SELECT AccountId FROM Contacts) FROM Account WHERE Id IN: setId];
+        system.debug('accList' + accList);
+        for(Account acc : accList)
+        {
+            if(acc.AnnualRevenue != null && acc.Contacts.size()>0)
+            {
+                newMap.put(acc.Id, (acc.AnnualRevenue/acc.Contacts.size()));
+            }
+        }
+         
+        conList = [SELECT Id, AccountId, Average_Annual_Revenue__c FROM Contact WHERE AccountId IN: newMap.keyset()];
+        system.debug('conList' + conList);
+        for(Contact con : conList)
+        {
+            if(newMap.Containskey(con.AccountId))
+            {
+                con.Average_Annual_Revenue__c = newMap.get(con.AccountId);
+            }
+        }
+        system.debug('conList.size()' + conList.size());
+        if(conList.size()>0)
+        {
+            update conList;
+        }        
+    }
+      
+    public static void UpdateMethod(List<Contact> newconList, Map<Id, Contact> oldMap)
+    {
+        set<Id> setId = new set<Id>();
+        system.debug('newconList' + newconList);
+        for(Contact con : newconList)
+        {
+            setId.add(con.AccountId);
+        }
+        
+        Map<Id, Decimal> newMap = new Map<Id, Decimal>();
+        List<Account> accList = [SELECT Id, AnnualRevenue,(SELECT AccountId FROM Contacts) FROM Account WHERE Id IN: setId];
+        system.debug('accList' + accList);
+        for(Account acc : accList)
+        {
+            if(acc.AnnualRevenue != null && acc.Contacts.size()>0)
+            {
+                newMap.put(acc.Id, (acc.AnnualRevenue/acc.Contacts.size()));
+            }
+        }
+         
+        newconList = [SELECT Id, AccountId, Average_Annual_Revenue__c FROM Contact WHERE AccountId IN: newMap.keyset()];
+        system.debug('newconList' + newconList);
+        for(Contact con : newconList)
+        {
+            if(newMap.Containskey(con.AccountId) && con.AccountId!= oldMap.get(con.Id).AccountId)
+            {
+                con.Average_Annual_Revenue__c = newMap.get(con.AccountId);
+            }
+        }    
+    }
+}

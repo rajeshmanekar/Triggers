@@ -1,0 +1,33 @@
+Helper//
+trigger CaseTrgHelper on Case (before insert,after insert)
+{
+    if(trigger.isafter && trigger.isinsert)
+    {
+      if(CaseTrgHandler.isFirstrun)
+      {
+       CaseTrgHandler.isFirstrun = False; 
+       CaseTrgHandler.CaseTrgHandlerMethod(trigger.new);
+      }   
+    }
+}
+
+Handler//
+public class CaseTrgHandler
+{
+    public static boolean isFirstrun = true;
+    public static void CaseTrgHandlerMethod(List<Case> newcaseList)
+    {    
+        List<Case> cList = new List<Case>();
+        for(Case c : newcaseList)
+        {
+            case ca = new case();
+            ca.Origin = c.Origin;
+            ca.Status = c.Status;
+            cList.add(ca);
+        }
+        if(cList.size()>0)
+        {
+          insert cList;    
+        }
+    }
+}

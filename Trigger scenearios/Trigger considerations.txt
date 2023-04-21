@@ -1,0 +1,19 @@
+On behalf of the record which fired the trigger.
+
+Trigger Event    Can change fields          Can update original object              Can delete original object 
+                 using trigger.new          using an update DML operation           using a delete DML operation
+				 
+before insert         Allowed.                    Not applicable.                        Not applicable. 
+
+after insert        Not allowed.                    Allowed.                          Allowed, but unnecessary.
+
+before update         Allowed.                    Not allowed.                           Not allowed.
+
+after update        Not allowed.                    Allowed.                               Allowed.
+
+before delete       Not allowed.                    Allowed.                             Not allowed.
+
+after delete        Not allowed.                  Not applicable.                        Not applicable.
+
+after undelete      Not allowed.                    Allowed.                          Allowed, but unnecessary.
+

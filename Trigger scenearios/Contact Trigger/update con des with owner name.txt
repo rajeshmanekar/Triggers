@@ -1,0 +1,27 @@
+Helper//
+
+
+
+Handler//
+public class UpdateConDeswithOwnerNameHandler 
+{
+    public static void MainMethod(List<Contact> cList)
+    {
+        List<Id> OwneridList = new List<Id>();
+        for(Contact con : cList)
+        {
+           OwneridList.add(con.OwnerId); 
+        }
+        
+        List<User> us = [SELECT Name FROM User WHERE Id IN: OwneridList];
+        Map<Id, String> newmap = new Map<Id, String>();
+        for(User use : us)
+        {
+            newMap.put(use.Id, use.Name);
+        }
+        for(contact c : cList)
+        {
+            c.Description = newMap.get(c.OwnerId);
+        }
+    }
+}
